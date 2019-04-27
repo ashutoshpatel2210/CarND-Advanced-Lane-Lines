@@ -215,15 +215,15 @@ Here's a [link to my video result](./project_video_output.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-# Issues faced:
+##### Issues faced:
  * Video has some part in bright light condition and some part in dark light condition, The same color thresholds can not be used for both conditions, so did some tweaking in parameters , Added red and green color threshols to detect lanes properly. 
  
-# Failure points:
+##### Failure points:
 * Pipeline will fail when there is very dense forest or tunnel. 
 * It will also fail in cases where huge white truck is crossing the same lane and white lane is partially visible. 
 * It will fail when roads are in hilly region or there are bumpy roads. 
 
-# To tackle above situations.
+##### To tackle above situations.
 * Pipeline is required to split into 2 or more based on lighting conditions and paramters are required to tune to based on that. Single pipeline can not detect all things with same params.
 * Take more samples of frames and try to match lane output of previous frame with current frame and see if there is huge anamoly or not. 
 * Reduced size of nwindows when roads are on hilly region. Sample sliding window with small number of windows. 
