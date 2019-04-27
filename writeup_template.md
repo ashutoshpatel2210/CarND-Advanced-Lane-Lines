@@ -40,6 +40,15 @@ The goals / steps of this project are the following:
 [image19]: ./output_images/histogram.png "Histogram of wrapped output of test image 3"
 [image20]: ./output_images/sliding_window.png "Sliding window of test image 3"
 [image21]: ./output_images/Similarlines.png "Detect lanes with of test image 3"
+[image22]: ./output_images/Final_output1.png "Final output of test images"
+[image23]: ./output_images/Final_output2.png "Final output of test images"
+[image24]: ./output_images/Final_output3.png "Final output of test images"
+[image25]: ./output_images/Final_output4.png "Final output of test images"
+[image26]: ./output_images/Final_output5.png "Final output of test images"
+[image27]: ./output_images/Final_output6.png "Final output of test images"
+[image28]: ./output_images/Final_output7.png "Final output of test images"
+[image29]: ./output_images/Final_output8.png "Final output of test images"
+
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
@@ -183,7 +192,14 @@ I implemented this step in my code in `AdvancedLaneFinding.ipynb` in the functio
 
 An example of its output can be observed below:
 
-![alt text][image6]
+![alt text][image22]
+![alt text][image23]
+![alt text][image24]
+![alt text][image25]
+![alt text][image26]
+![alt text][image27]
+![alt text][image28]
+![alt text][image29]
 
 ---
 
@@ -191,7 +207,7 @@ An example of its output can be observed below:
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./project_video_output.mp4)
 
 ---
 
@@ -199,4 +215,15 @@ Here's a [link to my video result](./project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+# Issues faced:
+ * Video has some part in bright light condition and some part in dark light condition, The same color thresholds can not be used for both conditions, so did some tweaking in parameters , Added red and green color threshols to detect lanes properly. 
+ 
+# Failure points:
+* Pipeline will fail when there is very dense forest or tunnel. 
+* It will also fail in cases where huge white truck is crossing the same lane and white lane is partially visible. 
+* It will fail when roads are in hilly region or there are bumpy roads. 
+
+# To tackle above situations.
+* Pipeline is required to split into 2 or more based on lighting conditions and paramters are required to tune to based on that. Single pipeline can not detect all things with same params.
+* Take more samples of frames and try to match lane output of previous frame with current frame and see if there is huge anamoly or not. 
+* Reduced size of nwindows when roads are on hilly region. Sample sliding window with small number of windows. 
