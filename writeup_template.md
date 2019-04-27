@@ -36,11 +36,10 @@ The goals / steps of this project are the following:
 [image15]: ./output_images/Binary_output6.png "Binary output of test images"
 [image16]: ./output_images/Binary_output7.png "Binary output of test images"
 [image17]: ./output_images/Binary_output8.png "Binary output of test images"
-
-[image3]: ./examples/binary_combo_example.jpg "Binary Example"
-[image4]: ./examples/warped_straight_lines.jpg "Warp Example"
-[image5]: ./examples/color_fit_lines.jpg "Fit Visual"
-[image6]: ./examples/example_output.jpg "Output"
+[image18]: ./output_images/Wrapped_output.png "Wrapped output ot test image 3"
+[image19]: ./output_images/histogram.png "Histogram of wrapped output of test image 3"
+[image20]: ./output_images/sliding_window.png "Sliding window of test image 3"
+[image21]: ./output_images/Similarlines.png "Detect lanes with of test image 3"
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
@@ -107,47 +106,82 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `warper()`, which appears in cell 7 and 8 in the file `AdvancedLaneFinding.ipynb` The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
 
 ```python
 src = np.float32(
-    [[(img_size[0] / 2) - 55, img_size[1] / 2 + 100],
-    [((img_size[0] / 6) - 10), img_size[1]],
-    [(img_size[0] * 5 / 6) + 60, img_size[1]],
-    [(img_size[0] / 2 + 55), img_size[1] / 2 + 100]])
+            ([590,450],[687,450],[1100,720],[200,720]))
 dst = np.float32(
-    [[(img_size[0] / 4), 0],
-    [(img_size[0] / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), img_size[1]],
-    [(img_size[0] * 3 / 4), 0]])
+            ([300,0],[900,0],[900,720],[300,720]))
 ```
 
 This resulted in the following source and destination points:
 
 | Source        | Destination   | 
 |:-------------:|:-------------:| 
-| 585, 460      | 320, 0        | 
-| 203, 720      | 320, 720      |
-| 1127, 720     | 960, 720      |
-| 695, 460      | 960, 0        |
+| 590, 450      | 300, 0        | 
+| 200, 720      | 300, 720      |
+| 1100, 720     | 900, 720      |
+| 687, 450      | 900, 0        |
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
 
-![alt text][image4]
+![alt text][image18]
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+In order to detect lane lines, first we need to define where to look for seach for lanes in image, I used histogram of x-positions to locate lanes from image. histogram will be good indicators of the x-position of the base of the lane lines. I used that as a starting point for where to search for the lines. 
+![alt text][image19]
 
-![alt text][image5]
+From that point, I use a sliding window, placed around the line centers, to find and follow the lines up to the top of the frame. First, i split the histogram into two sides, one for each lane line, next I setup window and hyperparameter related to sliding windows to select particular lane in image. 
+
+```python
+    # Choose the number of sliding windows
+    nwindows = 9
+    # Set the width of the windows +/- margin
+    margin = 100
+    # Set minimum number of pixels found to recenter window
+    minpix = 50
+  ```
+I iterate through nwindwos to look for curvature and find the mean position of activated pixels within the window to have shifted. After finding all pixels, I used functions np.polyfit(0 to fit polynomial to line, after finding polynomial, i skipped  sliding window approach to find lines withing the boundary of margin. I used only those pixels with x-values that are +/-  margin from polynomial lines. 
+
+![alt text][image20]
+![alt text][image21]
+
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+I did this in measure_curvature_real() function my code in `AdvancedLaneFinding.ipynb`
+```python
+def measure_curvature_real(left_fit, right_fit):
+    '''
+    Calculates the curvature of polynomial functions in meters.
+    '''
+    # Define conversions in x and y from pixels space to meters
+    ym_per_pix = 30/720 # meters per pixel in y dimension
+    xm_per_pix = 3.7/700 # meters per pixel in x dimension
+    
+    # Start by generating our fake example data
+    # Make sure to feed in your real data instead in your project!
+    ploty = np.linspace(0, 719, num=720)
+    left_fit_cr, right_fit_cr = left_fit, right_fit
+    
+    # Define y-value where we want radius of curvature
+    # We'll choose the maximum y-value, corresponding to the bottom of the image
+    y_eval = np.max(ploty)
+    
+    ##### TO-DO: Implement the calculation of R_curve (radius of curvature) #####
+    left_curverad = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])  ## Implement the calculation of the left line here
+    right_curverad = ((1 + (2*right_fit_cr[0]*y_eval*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])  ## Implement the calculation of the right line here
+    
+    return left_curverad, right_curverad
+```
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+I implemented this step in my code in `AdvancedLaneFinding.ipynb` in the function `final_pipeline()`.   I combined all techniques described above to detect lane in the function `final_pipeline()`. The code also disabled average curvature and centre offset in meters in image. 
+
+An example of its output can be observed below:
 
 ![alt text][image6]
 
