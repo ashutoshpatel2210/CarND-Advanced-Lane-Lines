@@ -20,7 +20,23 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [image1]: ./output_images/Undistort_image.png "Undistorted"
-[image2]: ./test_images/test1.jpg "Road Transformed"
+[image2]: ./output_images/Undistort_output1.png "Undistorted test images"
+[image3]: ./output_images/Undistort_output2.png "Undistorted test images"
+[image4]: ./output_images/Undistort_output3.png "Undistorted test images"
+[image5]: ./output_images/Undistort_output4.png "Undistorted test images"
+[image6]: ./output_images/Undistort_output5.png "Undistorted test images"
+[image7]: ./output_images/Undistort_output6.png "Undistorted test images"
+[image8]: ./output_images/Undistort_output7.png "Undistorted test images"
+[image9]: ./output_images/Undistort_output8.png "Undistorted test images"
+[image10]: ./output_images/Binary_output1.png "Binary output of test images"
+[image11]: ./output_images/Binary_output2.png "Binary output of test images"
+[image12]: ./output_images/Binary_output3.png "Binary output of test images"
+[image13]: ./output_images/Binary_output4.png "Binary output of test images"
+[image14]: ./output_images/Binary_output5.png "Binary output of test images"
+[image15]: ./output_images/Binary_output6.png "Binary output of test images"
+[image16]: ./output_images/Binary_output7.png "Binary output of test images"
+[image17]: ./output_images/Binary_output8.png "Binary output of test images"
+
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
 [image4]: ./examples/warped_straight_lines.jpg "Warp Example"
 [image5]: ./examples/color_fit_lines.jpg "Fit Visual"
@@ -41,12 +57,12 @@ The goals / steps of this project are the following:
 
 I imported packages needed in the project
 
-OpenCV - an open source computer vision library,
-Matplotbib - a python 2D plotting libray,
-Numpy - a package for scientific computing with Python,
-MoviePy - a Python module for video editing.
-os -  Miscellaneous operating system interfaces
-glob — Unix style pathname pattern expansion
+* OpenCV - an open source computer vision library,
+* Matplotbib - a python 2D plotting libray,
+* Numpy - a package for scientific computing with Python,
+* MoviePy - a Python module for video editing.
+* os -  Miscellaneous operating system interfaces
+* glob — Unix style pathname pattern expansion
 
 ### Camera Calibration
 
@@ -64,14 +80,30 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 
 #### 1. Provide an example of a distortion-corrected image.
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
+To demonstrate this step, I will describe how I apply the distortion correction distortion correction to the test image using the `cv2.undistort()` function and obtained this result of the all test images like this one:
+
 ![alt text][image2]
+![alt text][image3]
+![alt text][image4]
+![alt text][image5]
+![alt text][image6]
+![alt text][image7]
+![alt text][image8]
+![alt text][image9]
+
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+I used a combination of color and gradient thresholds to generate a binary image in cell 5 and output of the result is disaplyed in cell 6. I used red and green channel color threshold(threshold> 200) to detect yellow line properly in all conditions (shadow or bright light conditions), I also used HLS color thresold (Lightness and Value represent different ways to measure the relative lightness or darkness of a color), These min and max thresolds are as follows:  L channel (130,255)and S channel threshold (150, 255). I also applied gradient x threshold to channel s to detect edges in image. So binary image is combination of R & G, L, S colors and gradient in x driections. Here are the output of test images after applying the above procedure. 
 
-![alt text][image3]
+![alt text][image10]
+![alt text][image11]
+![alt text][image12]
+![alt text][image13]
+![alt text][image14]
+![alt text][image15]
+![alt text][image16]
+![alt text][image17]
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
