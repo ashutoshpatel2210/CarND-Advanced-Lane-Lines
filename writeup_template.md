@@ -36,10 +36,9 @@ The goals / steps of this project are the following:
 [image15]: ./output_images/Binary_output6.png "Binary output of test images"
 [image16]: ./output_images/Binary_output7.png "Binary output of test images"
 [image17]: ./output_images/Binary_output8.png "Binary output of test images"
-[image18]: ./output_images/Wrapped_output.png "Wrapped output ot test image 3"
-[image19]: ./output_images/histogram.png "Histogram of wrapped output of test image 3"
-[image20]: ./output_images/sliding_window.png "Sliding window of test image 3"
-[image21]: ./output_images/Similarlines.png "Detect lanes with of test image 3"
+[image18]: ./output_images/Wrapped_output.png "Wrapped output ot test image 5"
+[image19]: ./output_images/histogram.png "Histogram of wrapped output of test image 5"
+[image20]: ./output_images/sliding_window.png "Sliding window of test image 5"
 [image22]: ./output_images/Final_output1.png "Final output of test images"
 [image23]: ./output_images/Final_output2.png "Final output of test images"
 [image24]: ./output_images/Final_output3.png "Final output of test images"
@@ -100,7 +99,7 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image in cell 5 and output of the result is disaplyed in cell 6. I used red and green channel color threshold(threshold> 200) to detect yellow line properly in all conditions (shadow or bright light conditions), I also used HLS color thresold (Lightness and Value represent different ways to measure the relative lightness or darkness of a color), These min and max thresolds are as follows:  L channel (130,255)and S channel threshold (150, 255). I also applied gradient x threshold to channel s to detect edges in image. So binary image is combination of R & G, L, S colors and gradient in x driections. Here are the output of test images after applying the above procedure. 
+I used a combination of color and gradient thresholds to generate a binary image in cell 5 and output of the result is disaplyed in cell 6. I used red channel color threshold(threshold> 150) to detect yellow line properly in all conditions (shadow or bright light conditions), I also used LAB(B channel), LUV(L Channel), S Channel(HLS) color thresold (Lightness and Value represent different ways to measure the relative lightness or darkness of a color) and gradient in x direction, These min and max thresolds are as follows:  L channel from LUV (220,255), B channel from LAB threshold (190, 255), S Channel from HLS(100,255), R channel from RGB(150,255). I also applied gradient x threshold to channel l to detect edges in image. So binary image is combination of R(RGB) & B(LAB), L(LUV), S(HLS) colors and gradient in x driections. Here are the output of test images after applying the above procedure. 
 
 ![alt text][image10]
 ![alt text][image11]
@@ -138,27 +137,28 @@ I verified that my perspective transform was working as expected by drawing the 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
 In order to detect lane lines, first we need to define where to look for seach for lanes in image, I used histogram of x-positions to locate lanes from image. histogram will be good indicators of the x-position of the base of the lane lines. I used that as a starting point for where to search for the lines. 
+
 ![alt text][image19]
 
 From that point, I use a sliding window, placed around the line centers, to find and follow the lines up to the top of the frame. First, i split the histogram into two sides, one for each lane line, next I setup window and hyperparameter related to sliding windows to select particular lane in image. 
 
 ```python
-    # Choose the number of sliding windows
+  # Choose the number of sliding windows
     nwindows = 9
     # Set the width of the windows +/- margin
-    margin = 100
+    margin = 80
     # Set minimum number of pixels found to recenter window
-    minpix = 50
+    minpix = 140
   ```
-I iterate through nwindwos to look for curvature and find the mean position of activated pixels within the window to have shifted. After finding all pixels, I used functions np.polyfit(0 to fit polynomial to line, after finding polynomial, i skipped  sliding window approach to find lines withing the boundary of margin. I used only those pixels with x-values that are +/-  margin from polynomial lines. 
+I iterate through nwindwos to look for curvature and find the mean position of activated pixels within the window to have shifted. After finding all pixels, I used functions np.polyfit(0 to fit polynomial to line, after finding polynomial.
 
 ![alt text][image20]
-![alt text][image21]
 
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
 I did this in measure_curvature_real() function my code in `AdvancedLaneFinding.ipynb`
+
 ```python
 def measure_curvature_real(left_fit, right_fit):
     '''
@@ -171,13 +171,16 @@ def measure_curvature_real(left_fit, right_fit):
     # Start by generating our fake example data
     # Make sure to feed in your real data instead in your project!
     ploty = np.linspace(0, 719, num=720)
-    left_fit_cr, right_fit_cr = left_fit, right_fit
+    
+    #Fit a second order polynomial to pixel positions in each fake lane line
+    left_fit_cr = np.polyfit(ploty*ym_per_pix, left_fit*xm_per_pix, 2)
+    right_fit_cr = np.polyfit(ploty*ym_per_pix, right_fit*xm_per_pix, 2)
     
     # Define y-value where we want radius of curvature
     # We'll choose the maximum y-value, corresponding to the bottom of the image
     y_eval = np.max(ploty)
     
-    ##### TO-DO: Implement the calculation of R_curve (radius of curvature) #####
+    ##### Implement the calculation of R_curve (radius of curvature) #####
     left_curverad = ((1 + (2*left_fit_cr[0]*y_eval*ym_per_pix + left_fit_cr[1])**2)**1.5) / np.absolute(2*left_fit_cr[0])  ## Implement the calculation of the left line here
     right_curverad = ((1 + (2*right_fit_cr[0]*y_eval*ym_per_pix + right_fit_cr[1])**2)**1.5) / np.absolute(2*right_fit_cr[0])  ## Implement the calculation of the right line here
     
